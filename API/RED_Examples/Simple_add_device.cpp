@@ -1,4 +1,4 @@
-//To send : g++ -o launch Simple_buffer_post.cpp -lcurl -std=c++11 -Wall && ./launch
+//To send : g++ -o launch Simple_add_device.cpp -lcurl -std=c++11 -Wall && ./launch
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -20,30 +20,15 @@
 
 int main(void)
 {
-	Red* red =new Red();
-	string value="This is the value I would like to send safely using RED API";
-	string device_id=get_DID();
+	Red* red =new Red();	
+	
 	//red_config will return a red object with the Red server adress by default
 	//Or you can set up your own server adress by using red->set_red_option(red,Red_Option::SET_HOST,"http://example.com");
-	//Or you can set up after if you don't want to pass by red_config using : red->set_red_option(red,Red_Option::SET_RED_HOST);
+	//Or you can set up after the default Red server adress if you don't want to pass by red_config using : red->set_red_option(red,Red_Option::SET_RED_HOST);
 	red=red_config(); 
 
 	//Setting up the device Id
-	red->set_red_option(red,Red_Option::SET_DEVICE_ID,device_id);
-
-	//Name your own data type label such as apple or peach
-	red->set_red_option(red,Red_Option::SET_DATA_TYPE,"Apple");
-
-	//Set the buffer if you want to bufferize what you send
-	red->set_red_option(red,Red_Option::SET_BUFFER,value);
-
-	//If you want to get that that buffer
-	string buffer = red->set_red_option(red,Red_Option::GET_BUFFER);
+	cout<<red->set_red_option(red,Red_Option::ADD_NEW_DEVICE);
 	
-	//You may want to display all the info about the red object before sending
-	red->display();
-
-	//Send it safely using post (return a std::string response indication)
-	cout<<red->set_red_option(red,Red_Option::SEND_DATAS,value);	
 
 }

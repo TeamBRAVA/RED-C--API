@@ -22,21 +22,23 @@ int main(void)
 {
 	Red* red =new Red();
 	string value="This is the value I would like to send safely using RED API";
+	string device_id=get_DID();
 	//red_config will return a red object with the Red server adress by default
 	//Or you can set up your own server adress by using red->set_red_option(red,Red_Option::SET_HOST,"http://example.com");
 	//Or you can set up after the default Red server adress if you don't want to pass by red_config using : red->set_red_option(red,Red_Option::SET_RED_HOST);
 	red=red_config(); 
 
 	//Setting up the device Id
-	red->set_red_option(red,Red_Option::SET_DEVICE_ID,1);
+	red->set_red_option(red,Red_Option::SET_DEVICE_ID,device_id);
 
 	//Name your own data type label such as apple or peach
 	red->set_red_option(red,Red_Option::SET_DATA_TYPE,"Apple");
 
 	//You may want to display all the info about the red object before sending
 	red->display();
-
 	//Send it safely using post (return a std::string response indication)
-	cout<<red->post(red,value);	
+    cout<< red->set_red_option(red,Red_Option::SEND_DATAS,value);
+	
+	
 
 }
