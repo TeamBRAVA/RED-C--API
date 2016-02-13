@@ -10,65 +10,69 @@
 using namespace std;
 
 
-
 enum Red_Option { 
   SET_HOST, 
-  SET_RED_HOST,
-  SET_DEVICE_ID, 
+  SET_RED_HOST,  
   SET_DATA_TYPE,
   SET_BUFFER,
-  GET_HOST,
-  GET_DEVICE_ID,
+  SET_NEW_PERMISSION,
+  GET_HOST,  
   GET_DATA_TYPE,
-  GET_BUFFER
-
+  GET_BUFFER,
+  LIST_PERMISSION,
+  SEND_DATAS,
+  GET_DATAS,
+  ADD_NEW_DEVICE,
+  SET_PASSPHRASE,
+  SET_CERTIFICATE
   };
 
-static const string Red_adress ="http://localhost:3000";
+static const string Red_adress ="https://api.red-cloud.io";
 
 class Red{	
 
   protected:
     
 	string host;
-  int device_id;     
+  string _post;   
   string data_type;
   string buffer;
-
+  string passphrase;
+  string certificate;
 
   public:
    
-    Red(string ahost,int adevice_id,string adata_type);
+    Red(string ahost,string adata_type);
     Red();
     ~Red();
 
     virtual void display();
-   // virtual Red* red_config();
-
-    virtual string post(Red* red,string value);
-    virtual void list_permission();
-    virtual void watch();
-    virtual void update();
+  
+    virtual string post(Red* red);   
+    virtual void watch();    
     virtual string get(Red* red);
-    virtual string get_from(Red* red);
     
 
-
-	  virtual void set_red_option(Red* red,Red_Option option,string value);
-    virtual void set_red_option(Red* red,Red_Option option,int value);
-    virtual void set_red_option(Red* red,Red_Option option,float value);
-    virtual void set_red_option(Red* red,Red_Option option,char value);
+	  virtual string set_red_option(Red* red,Red_Option option,string value);
+    virtual string set_red_option(Red* red,Red_Option option,int value);
+    virtual string set_red_option(Red* red,Red_Option option,float value);
+    virtual string set_red_option(Red* red,Red_Option option,char value);
     virtual string set_red_option(Red* red,Red_Option option); 
-    
 
+    virtual void set_certificate(string path_cert);
+    virtual void set_passphrase(string new_pass);
     virtual void set_host(string new_host);
+    virtual void set_post(string new_post);
     virtual void set_buffer(string abuffer);
-    virtual void set_device_id(int id);
     virtual void set_data_type(string type);
+    virtual void append_host(string append_host);
+    virtual void append_post(string append_post);
     
+    virtual string get_certificate();
+    virtual string get_passphrase();
     virtual string get_host();
+    virtual string get_post();
     virtual string get_buffer();
-    virtual int get_device_id();
     virtual string get_data_type();
 
 };
@@ -82,8 +86,8 @@ Red* red_config()
   return red_init;
 }
 
-Red::Red(string ahost,int adevice_id,string adata_type) :
-  host(ahost),device_id(adevice_id),data_type(adata_type)
+Red::Red(string ahost,string adata_type) :
+  host(ahost),data_type(adata_type)
 {}
 
 Red::Red()
@@ -96,46 +100,62 @@ Red::~Red()
 
 
 void Red::display(){;
-  cout <<endl<< "The host is: " << host <<endl<< "The device Id is: "<<device_id<<endl<<"The data type is: "<<data_type<<endl;
+  cout <<endl<< "The host is: " << host<<endl<<"The data type is: "<<data_type<<endl;
   !(buffer.empty()) ? cout<<"The buffer is: "<<buffer<<endl : cout<<endl;
 }
+size_t handleHeader(void *ptr, size_t size, size_t count, void *stream){ 
+  ((string*)stream)->append((char*)ptr, 0, size*count);
+  return size*count;
+}
 
-size_t write_to_string(void *ptr, size_t size, size_t count, void *stream) {
+size_t handleBody(void *ptr, size_t size, size_t count, void *stream) {
   ((string*)stream)->append((char*)ptr, 0, size*count);
   return size*count;
 }
 
 
-string Red::post (Red* red,string value)
+string Red::post (Red* red)
 {
-
   CURL *curl;
   CURLcode res;
+  struct curl_slist *headers = NULL;
+
   string response_POST_from_server;
-  string response;
+  string response_HEADER_from_server;
+  string response_to_client;
 
-  string host =red->get_host();
-  host+="/device";
 
-  string post ="deviceid=";
-  post+= to_string(red->get_device_id());
-  post+="&datatype=";
-  post+=red->get_data_type();
-  post+="&value=";
-  post+=value; 
+  string host=red->get_host();
+  string post=red->get_post();
+ 
+  string cert=red->get_certificate();
+  string passphrase = red->get_passphrase();
+  string header_response;
 
   curl = curl_easy_init();
   if(curl) {
     curl_easy_setopt(curl, CURLOPT_URL, host.c_str());
+    headers = curl_slist_append(headers, "Content-Type: application/json");
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post.c_str());
 
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+
+    //Add the certificate    
+    curl_easy_setopt(curl,CURLOPT_SSLCERT,cert.c_str());
+
+    //Add the passphrase
+    curl_easy_setopt(curl,CURLOPT_KEYPASSWD,passphrase.c_str());
     /* if we don't provide POSTFIELDSIZE, libcurl will strlen() by
        itself */
     //curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, 4);
 
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_to_string);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_POST_from_server);
-
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, handleBody);
+    curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, handleHeader);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA,&response_POST_from_server);
+    curl_easy_setopt(curl, CURLOPT_HEADERDATA,&response_HEADER_from_server);
+    cout<<"HEADER:"<<response_HEADER_from_server;
     /* Perform the request, res will get the return code */
     res = curl_easy_perform(curl);
     
@@ -148,36 +168,17 @@ string Red::post (Red* red,string value)
     curl_easy_cleanup(curl);
   
   }
-  if(response_POST_from_server.find("\"ok\":1")!=string::npos)
+  /*if(response_POST_from_server.find("\"ok\":1")!=string::npos)
   {
-     response+="Well sent\n";
+    response+="Well sent\n";
   }
   if(response_POST_from_server.find("\"nModified\":1"))
   {
-      response+="Your data as been added to your device\n"; 
+    response+="Your data as been added to your device\n"; 
   }
-    
-
-  return response;
-
-
-}
-
-void Red::list_permission()
-{
-
-}
-void Red::watch()
-{
-
-}
-void Red::update()
-{
-
-}
-string Red::get_from(Red* red)
-{
-  return "Soon ready" ;
+  */    
+    return response_POST_from_server;
+ // return response_to_client;
 }
 
 
@@ -185,18 +186,19 @@ string Red::get (Red* red)
 {
   CURL *curl;
   CURLcode res;
-  string response_GET_from_server;  
-  string get = red->get_host();
-  get+="/device/";
-  get+=to_string(red->get_device_id());
-  get+="/";
-  get+=red->get_data_type();
+  string response_GET_from_server; 
+
+  string host = red->get_host();
+  string cert = red->get_certificate();
+  string passphrase = red->get_passphrase();
   curl_global_init(CURL_GLOBAL_DEFAULT);
 
   curl = curl_easy_init();
   if(curl) {
 
-    curl_easy_setopt(curl, CURLOPT_URL, get.c_str());
+    curl_easy_setopt(curl, CURLOPT_URL, host.c_str());
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
 
 #ifdef SKIP_PEER_VERIFICATION
     /*
@@ -221,8 +223,12 @@ string Red::get (Red* red)
      */
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
 #endif
+     //Add the certificate    
+    curl_easy_setopt(curl,CURLOPT_SSLCERT,cert.c_str());
 
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_to_string);
+    //Add the passphrase
+    curl_easy_setopt(curl,CURLOPT_KEYPASSWD,passphrase.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, handleBody);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_GET_from_server);
     
     /* Perform the request, res will get the return code */
@@ -230,39 +236,59 @@ string Red::get (Red* red)
     /* Check for errors */
     if(res != CURLE_OK)
       fprintf(stderr, "curl_easy_perform() failed: %s\n",
-              curl_easy_strerror(res));
-    
+              curl_easy_strerror(res));    
 
     /* always cleanup */
     curl_easy_cleanup(curl);
   }
-
   curl_global_cleanup();
 
    return response_GET_from_server ;
   }
 
+void Red::watch()
+{
+
+}
+
 void Red::set_host(string new_host)
 {
   host=new_host;
 }
-
-void Red::set_device_id(int id)
+void Red::set_post(string new_post)
 {
-  device_id=id;
+  _post=new_post;
 }
+
 void Red::set_data_type(string type)
 {
   data_type=type;
+}
+void Red::set_passphrase(string new_pass)
+{
+  passphrase=new_pass;
+}
+void Red::set_certificate(string path_cert)
+{
+  certificate=path_cert;
 }
 
 string Red::get_host()
 {
   return host;
 }
-int Red::get_device_id()
+string Red::get_post()
 {
-  return device_id;
+  return _post;
+}
+void Red::append_post(string append_post)
+{
+  _post+=append_post;  
+}
+void Red::append_host(string append_host)
+{
+  host+=append_host;
+ 
 }
 string Red::get_data_type()
 { 
@@ -276,13 +302,34 @@ string Red::get_buffer()
 {
     return buffer;
 }
+string Red::get_passphrase()
+{ 
+  return passphrase;
+}
+string Red::get_certificate()
+{ 
+  return certificate;
+}
 
-
-void Red::set_red_option(Red* red,Red_Option option,string value)
-{
-    //cout<<"STRING"<<endl;
+string Red::set_red_option(Red* red,Red_Option option,string value)
+{    
     switch (option) 
     {
+        case SEND_DATAS :
+          red->set_post("{\"datatype\":\"");
+          red->append_post(red->get_data_type());
+          red->append_post("\",\"value\":\"");
+          red->append_post(value);
+          red->append_post("\"}");  
+          red->get_host() == Red_adress ? red->append_host("/device") : red->append_host("");                    
+          return red->post(red);
+        break;        
+        case SET_PASSPHRASE:        
+            red->set_passphrase(value);
+        break;
+        case SET_CERTIFICATE:        
+            red->set_certificate(value);
+        break;
         case SET_DATA_TYPE :
             red->set_data_type(value);
         break;
@@ -295,25 +342,65 @@ void Red::set_red_option(Red* red,Red_Option option,string value)
         default:
         cout<< "not recognized option: "<< value;
     }
+    return "OK";
 }
 
-void Red::set_red_option(Red *red,Red_Option option,int value)
+string Red::set_red_option(Red *red,Red_Option option,int value)
 {
-     //cout<<"INT"<<endl;
-       red->set_device_id(value);
-    
+switch (option)
+{
+   case SEND_DATAS :
+          red->set_post("{\"datatype\":\"");
+          red->append_post(red->get_data_type());
+          red->append_post("\",\"value\":\"");
+          red->append_post(to_string(value));
+          red->append_post("\"}");      
+          red->get_host() == Red_adress ? red->append_host("/device") : red->append_host("");                    
+          return red->post(red);
+          break;   
+   
+   default:
+    return "not recognized option";
+}      
+       return "OK";    
 }
 
-void Red::set_red_option(Red* red,Red_Option option, float value)
+string Red::set_red_option(Red* red,Red_Option option, float value)
+{   
+  switch (option)
 {
-     //cout<<"FLOAT"<<endl;
-    red->set_device_id((int)value);
+   case SEND_DATAS :
+          red->set_post("{\"datatype\":\"");
+          red->append_post(red->get_data_type());
+          red->append_post("\",\"value\":\"");
+          red->append_post(to_string(value));
+          red->append_post("\"}");          
+          red->get_host() == Red_adress ? red->append_host("/device") : red->append_host("");                    
+          return red->post(red);
+   break;
+   default:
+    return "not recognized option";
+}    
+    return "OK";
 }
 
-void Red::set_red_option(Red* red,Red_Option option, char value)
-{
-     //cout<<"CHAR"<<endl;
-    red->set_device_id((int)value);
+string Red::set_red_option(Red* red,Red_Option option, char value)
+{     
+  switch (option)
+{  
+   case SEND_DATAS :         
+          red->set_post("{\"datatype\":\"");
+          red->append_post(red->get_data_type());
+          red->append_post("\",\"value\":\"");
+          red->append_post(to_string(value));
+          red->append_post("\"}");         
+          red->get_host() == Red_adress ? red->append_host("/device") : red->append_host("");                    
+          return red->post(red);
+   break;   
+   default:
+    return "not recognized option";
+}    
+    return "OK";
 }
 string Red::set_red_option(Red* red,Red_Option option)
 {
@@ -325,19 +412,27 @@ string Red::set_red_option(Red* red,Red_Option option)
       case  GET_DATA_TYPE:
       return red->get_data_type();
       break;
-      case  GET_DEVICE_ID:
-      return to_string(red->get_device_id());
-      break;
       case  GET_BUFFER:
       return red->get_buffer();
+      break;
+      case  GET_DATAS:
+      red->append_host("/device/");
+      red->append_host(red->get_data_type());        
+      return red->get(red);
+      break;
+       case ADD_NEW_DEVICE :
+          red->get_host()== Red_adress ? red->append_host("/newDevice") : red->append_host("");          
+          return red->get(red);
       break;
       case SET_RED_HOST:
              red->set_host(Red_adress);
       return "Red servers are now the new host";
+      case LIST_PERMISSION:
+      return "INCOMMING";
       default:
       return "no recognize option: ";
     }
-    return "Error";
+    
 }
 
 

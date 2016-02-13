@@ -22,20 +22,20 @@ int main(void)
 {
 	Red* red =new Red();
 	string value="This is the value I would like to send safely using RED API";
-	string device_id=get_DID();
+	string data_type="Fruit";
 	//red_config will return a red object with the Red server adress by default
 	//Or you can set up your own server adress by using red->set_red_option(red,Red_Option::SET_HOST,"http://example.com");
 	//Or you can set up after if you don't want to pass by red_config using : red->set_red_option(red,Red_Option::SET_RED_HOST);
 	red=red_config(); 
 
-	//Setting up the device Id
-	red->set_red_option(red,Red_Option::SET_DEVICE_ID,device_id);
-
 	//Name your own data type label such as apple or peach
-	red->set_red_option(red,Red_Option::SET_DATA_TYPE,"Apple");
+	red->set_red_option(red,Red_Option::SET_DATA_TYPE,data_type);
 
 	//Set the buffer if you want to bufferize what you send
 	red->set_red_option(red,Red_Option::SET_BUFFER,value);
+
+	red->set_red_option(red,Red_Option::SET_CERTIFICATE,"RED-certifs/device1.pem");
+	red->set_red_option(red,Red_Option::SET_PASSPHRASE,"0F9BCA6E5B");
 
 	//If you want to get that that buffer
 	string buffer = red->set_red_option(red,Red_Option::GET_BUFFER);
