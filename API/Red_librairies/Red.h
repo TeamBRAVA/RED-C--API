@@ -155,8 +155,8 @@ string Red::post (Red* red)
     curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, handleHeader);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA,&response_POST_from_server);
     curl_easy_setopt(curl, CURLOPT_HEADERDATA,&response_HEADER_from_server);
-    cout<<"HEADER:"<<response_HEADER_from_server;
-    cout<<"BODY:"<<response_POST_from_server;
+   // cout<<"HEADER:"<<response_HEADER_from_server<<endl;
+    //cout<<"BODY:"+response_POST_from_server<<endl;
     /* Perform the request, res will get the return code */
     res = curl_easy_perform(curl);
     
