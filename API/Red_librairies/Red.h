@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <curl/curl.h>
 
-
 using namespace std;
 
 
@@ -120,10 +119,9 @@ string Red::post (Red* red)
   CURLcode res;
   struct curl_slist *headers = NULL;
 
-  string response_POST_from_server;
-  string response_HEADER_from_server;
-  string response_to_client;
-
+  long response_HTTP_CODE_from_server;  
+  string response_from_post;
+  
 
   string host=red->get_host();
   string post=red->get_post();
@@ -151,15 +149,20 @@ string Red::post (Red* red)
        itself */
     //curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, 4);
 
+    /*
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, handleBody);
     curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, handleHeader);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA,&response_POST_from_server);
     curl_easy_setopt(curl, CURLOPT_HEADERDATA,&response_HEADER_from_server);
-   // cout<<"HEADER:"<<response_HEADER_from_server<<endl;
-    //cout<<"BODY:"+response_POST_from_server<<endl;
+    */
+  
     /* Perform the request, res will get the return code */
     res = curl_easy_perform(curl);
     
+   
+    curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &response_HTTP_CODE_from_server);
+    
+
     /* Check for errors */
     if(res != CURLE_OK)
       fprintf(stderr, "curl_easy_perform() failed: %s\n",
@@ -169,17 +172,26 @@ string Red::post (Red* red)
     curl_easy_cleanup(curl);
   
   }
-  /*if(response_POST_from_server.find("\"ok\":1")!=string::npos)
-  {
-    response+="Well sent\n";
-  }
-  if(response_POST_from_server.find("\"nModified\":1"))
-  {
-    response+="Your data as been added to your device\n"; 
-  }
-  */    
-    return response_POST_from_server;
- // return response_to_client;
+  /*
+    switch (response_HTTP_CODE_from_server.c_str())
+    {
+      case "200" :
+      response_from_post="Well sent";
+      break;
+      case "404":
+      response_from_post="Link not found";
+      break;
+      case "401" :
+      response_from_post="Unauthorized";
+      break;
+      default :
+      response_from_post="ERROR";
+      break;
+    }
+    */
+     
+    return "haha";
+ 
 }
 
 

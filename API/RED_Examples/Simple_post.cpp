@@ -27,7 +27,7 @@ int main(void)
 	//You may want to display all the info about the red object before sending
 	red->display();
 	//Send it safely using post (return a std::string response indication)
-    cout<< red->set_red_option(red,Red_Option::SEND_DATAS,value);
+    cout<< red->set_red_option(red,Red_Option::SEND_DATAS,value)<<endl;
 		
     return 0;
 }
