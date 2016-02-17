@@ -156,6 +156,7 @@ string Red::post (Red* red)
     curl_easy_setopt(curl, CURLOPT_WRITEDATA,&response_POST_from_server);
     curl_easy_setopt(curl, CURLOPT_HEADERDATA,&response_HEADER_from_server);
     cout<<"HEADER:"<<response_HEADER_from_server;
+    cout<<"BODY:"<<response_POST_from_server;
     /* Perform the request, res will get the return code */
     res = curl_easy_perform(curl);
     
@@ -357,7 +358,12 @@ switch (option)
           red->append_post("\"}");      
           red->get_host() == Red_adress ? red->append_host("/device") : red->append_host("");                    
           return red->post(red);
-          break;   
+          break;  
+    case ADD_NEW_DEVICE:          
+          red->get_host()== Red_adress ? red->append_host("/device/new/") : red->append_host("");    
+          red->append_host(to_string(value));      
+          return red->get(red);
+      break;
    
    default:
     return "not recognized option";
@@ -420,8 +426,8 @@ string Red::set_red_option(Red* red,Red_Option option)
       red->append_host(red->get_data_type());        
       return red->get(red);
       break;
-       case ADD_NEW_DEVICE :
-          red->get_host()== Red_adress ? red->append_host("/newDevice") : red->append_host("");          
+      case ADD_NEW_DEVICE:          
+          red->get_host()== Red_adress ? red->append_host("/device/new/1") : red->append_host("");          
           return red->get(red);
       break;
       case SET_RED_HOST:

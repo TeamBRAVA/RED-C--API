@@ -30,8 +30,9 @@ int main(void)
 	red->set_red_option(red,Red_Option::SET_CERTIFICATE,"RED-certifs/device1.pem");
 	red->set_red_option(red,Red_Option::SET_PASSPHRASE,"0F9BCA6E5B");
 	
-	//Setting up the device Id
-	cout<<red->set_red_option(red,Red_Option::ADD_NEW_DEVICE);
-	
+	//Add one device by default
+	//cout<<red->set_red_option(red,Red_Option::ADD_NEW_DEVICE);
+	//Add multiple device
+	cout<<red->set_red_option(red,Red_Option::ADD_NEW_DEVICE,3);
 
 }

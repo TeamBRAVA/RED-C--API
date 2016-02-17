@@ -5,11 +5,10 @@
 #include <iostream>
 #include <stdio.h>
 
-
 int main(void)
 {
 	Red* red =new Red();
-	string value="Requin";
+	string value="Girafe";
 	string data_type="Animal";
 	//red_config will return a red object with the Red server adress by default
 	//Or you can set up your own server adress by using red->set_red_option(red,Red_Option::SET_HOST,"http://example.com");
@@ -29,7 +28,6 @@ int main(void)
 	red->display();
 	//Send it safely using post (return a std::string response indication)
     cout<< red->set_red_option(red,Red_Option::SEND_DATAS,value);
-	
-	
-    	return 0;
+		
+    return 0;
 }

@@ -21,9 +21,9 @@
 int main(void)
 {
 	Red* red =new Red();
-	string sent_value="Elephant";
-	string return_value;
+	string sent_value="Elephant";	
 	string data_type = "Animal";
+	string return_value;
 
 	//red_config will return a red object with the Red server adress by default
 	//Or you can set up your own server adress by using red->set_red_option(red,Red_Option::SET_HOST,"http://example.com");

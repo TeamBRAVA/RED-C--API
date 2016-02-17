@@ -21,7 +21,7 @@
 int main(void)
 {
 	Red* red =new Red();
-	string value="This is the value I would like to send safely using RED API";
+	string value="Pinapple";
 	string data_type="Fruit";
 	//red_config will return a red object with the Red server adress by default
 	//Or you can set up your own server adress by using red->set_red_option(red,Red_Option::SET_HOST,"http://example.com");
