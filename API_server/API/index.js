@@ -4,8 +4,6 @@ require('./response');
 var db = require('../DB/dbData');
 
 /* API for IOT */
-
-
 //update the object
 router.get('/device/update', function (req, res) {
     //call update function
@@ -36,8 +34,6 @@ router.get('/device/:deviceid/:datatype', function (req, res) {
             res.respond(result);
     }
 });
-
-
 
 /* GET data identified with key and date from device : id*/
 router.get('/device/:deviceid/:datatype/:date', function (req, res) {
@@ -100,7 +96,6 @@ router.get('/permissions/:userid', function (req, res) {
     }
 });
 
-
 /* POST user/data (OK)*/
 //the body must have three values in it : deviceid, datatype, permission
 router.post('/user/new', function (req, res) {
@@ -120,8 +115,6 @@ router.post('/user/new', function (req, res) {
             res.respond(result);
     }
 });
-
-
 
 /* POST user/data (OK)*/
 //the body must have three values in it : deviceid, datatype, permission
