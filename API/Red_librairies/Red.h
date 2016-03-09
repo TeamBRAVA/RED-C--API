@@ -190,7 +190,7 @@ string Red::post (Red* red)
     }
     */
      
-    return "haha";
+    return to_string(response_HTTP_CODE_from_server);
  
 }
 
