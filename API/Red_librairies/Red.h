@@ -5,10 +5,11 @@
 #include <iostream>
 #include <stdio.h>
 #include <curl/curl.h>
+#include <fstream>
 
 using namespace std;
 
-
+static std::string readBuffer;
 enum Red_Option { 
   SET_HOST, 
   SET_RED_HOST,  
@@ -31,13 +32,17 @@ static const string Red_adress ="https://api.red-cloud.io";
 class Red{	
 
   protected:
-    
+
 	string host;
-  string _post;   
+  string body;   
+  string header;
   string data_type;
   string buffer;
   string passphrase;
   string certificate;
+  string token;
+  long HTTPcode;
+  
 
   public:
    
@@ -47,8 +52,7 @@ class Red{
 
     virtual void display();
   
-    virtual string post(Red* red);   
-    virtual void watch();    
+    virtual string post(Red* red);        
     virtual string get(Red* red);
     
 
@@ -61,21 +65,32 @@ class Red{
     virtual void set_certificate(string path_cert);
     virtual void set_passphrase(string new_pass);
     virtual void set_host(string new_host);
-    virtual void set_post(string new_post);
+    virtual void set_body(string new_body);
     virtual void set_buffer(string abuffer);
     virtual void set_data_type(string type);
     virtual void append_host(string append_host);
-    virtual void append_post(string append_post);
+    virtual void append_body(string append_body);
+    virtual void set_token(string new_token);
+    virtual void set_HTTPcode(long new_http);
     
     virtual string get_certificate();
     virtual string get_passphrase();
     virtual string get_host();
-    virtual string get_post();
+    virtual string get_body();
     virtual string get_buffer();
     virtual string get_data_type();
+    virtual string get_token();
+    virtual long get_HTTPcode();
 
 };
-size_t write_to_string(void *ptr, size_t size, size_t count, void *stream);  
+string parse_token(string result)
+{
+  int from;
+  int to;
+  from = result.find("token")+8;
+  to = result.find("message\":\"Unauthorized : invalid token")-59;  
+  return result.substr(from,to);
+}
 
 //This function will create a red object with the red server adress by default
 Red* red_config()
@@ -99,9 +114,10 @@ Red::~Red()
 
 
 void Red::display(){;
-  cout <<endl<< "The host is: " << host<<endl<<"The data type is: "<<data_type<<endl;
+  cout <<endl<< "The host is: " << host<<endl<<"The data type is: "<<data_type<<endl<<"The certificate passphrase is: "<<certificate<<endl;
   !(buffer.empty()) ? cout<<"The buffer is: "<<buffer<<endl : cout<<endl;
 }
+
 size_t handleHeader(void *ptr, size_t size, size_t count, void *stream){ 
   ((string*)stream)->append((char*)ptr, 0, size*count);
   return size*count;
@@ -118,22 +134,20 @@ string Red::post (Red* red)
   CURL *curl;
   CURLcode res;
   struct curl_slist *headers = NULL;
-
   long response_HTTP_CODE_from_server;  
-  string response_from_post;
-  
-
+  string response_POST_from_server;
+  string response_header;  
+  string token_header= "authorization: bearer "+red->get_token();
   string host=red->get_host();
-  string post=red->get_post();
- 
+  string post=red->get_body();
   string cert=red->get_certificate();
   string passphrase = red->get_passphrase();
-  string header_response;
 
   curl = curl_easy_init();
   if(curl) {
     curl_easy_setopt(curl, CURLOPT_URL, host.c_str());
     headers = curl_slist_append(headers, "Content-Type: application/json");
+    headers = curl_slist_append(headers, token_header.c_str());
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post.c_str());
 
@@ -149,19 +163,21 @@ string Red::post (Red* red)
        itself */
     //curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, 4);
 
-    /*
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, handleBody);
-    curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, handleHeader);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA,&response_POST_from_server);
-    curl_easy_setopt(curl, CURLOPT_HEADERDATA,&response_HEADER_from_server);
-    */
-  
-    /* Perform the request, res will get the return code */
-    res = curl_easy_perform(curl);
-    
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, handleBody);  
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA,&response_POST_from_server);    
    
+    curl_easy_setopt( curl, CURLOPT_HEADERFUNCTION, handleHeader );
+    curl_easy_setopt( curl, CURLOPT_HEADERDATA, &response_header );
+
+    /* Perform the request, res will get the return code */
+  
+    res = curl_easy_perform(curl);   
+
     curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &response_HTTP_CODE_from_server);
-    
+    red->set_HTTPcode(response_HTTP_CODE_from_server);
+    //cout <<"HTTPS CODE :" + to_string(response_HTTP_CODE_from_server)<<endl ;
+    //cout <<"HEADER: " + response_header <<endl ;
+    //cout <<"BODY: " +response_POST_from_server <<endl;
 
     /* Check for errors */
     if(res != CURLE_OK)
@@ -169,30 +185,16 @@ string Red::post (Red* red)
               curl_easy_strerror(res));
 
     /* always cleanup */
-    curl_easy_cleanup(curl);
-  
+    curl_easy_cleanup(curl);  
   }
-  /*
-    switch (response_HTTP_CODE_from_server.c_str())
-    {
-      case "200" :
-      response_from_post="Well sent";
-      break;
-      case "404":
-      response_from_post="Link not found";
-      break;
-      case "401" :
-      response_from_post="Unauthorized";
-      break;
-      default :
-      response_from_post="ERROR";
-      break;
-    }
-    */
-     
-    return to_string(response_HTTP_CODE_from_server);
+  if( red->get_HTTPcode()==401)
+  {   
+    red->set_token(parse_token(response_POST_from_server));   
+    return to_string(red->get_HTTPcode());
+  }
  
-}
+    return to_string(red->get_HTTPcode());
+ }
 
 
 string Red::get (Red* red)
@@ -201,15 +203,21 @@ string Red::get (Red* red)
   CURLcode res;
   string response_GET_from_server; 
 
+  struct curl_slist *headers = NULL;
   string host = red->get_host();
   string cert = red->get_certificate();
   string passphrase = red->get_passphrase();
+  string response_HTTP_CODE_from_server;
+  string response_header;  
+  string token_header= "authorization: bearer "+red->get_token();
   curl_global_init(CURL_GLOBAL_DEFAULT);
 
   curl = curl_easy_init();
   if(curl) {
 
     curl_easy_setopt(curl, CURLOPT_URL, host.c_str());
+    headers = curl_slist_append(headers, token_header.c_str());
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
 
@@ -246,6 +254,8 @@ string Red::get (Red* red)
     
     /* Perform the request, res will get the return code */
     res = curl_easy_perform(curl);
+
+    curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &response_HTTP_CODE_from_server);
     /* Check for errors */
     if(res != CURLE_OK)
       fprintf(stderr, "curl_easy_perform() failed: %s\n",
@@ -259,18 +269,13 @@ string Red::get (Red* red)
    return response_GET_from_server ;
   }
 
-void Red::watch()
-{
-
-}
-
 void Red::set_host(string new_host)
 {
   host=new_host;
 }
-void Red::set_post(string new_post)
+void Red::set_body(string new_body)
 {
-  _post=new_post;
+  body=new_body;
 }
 
 void Red::set_data_type(string type)
@@ -285,18 +290,41 @@ void Red::set_certificate(string path_cert)
 {
   certificate=path_cert;
 }
+void Red::set_token(string new_token)
+{
+  ofstream cache;
+  cache.open ("cache.txt"); 
+  cache << new_token;
+  cache.close();
+  token=new_token;
+}
+
+void Red::set_HTTPcode(long new_http)
+{
+  HTTPcode=new_http;
+}
 
 string Red::get_host()
 {
   return host;
 }
-string Red::get_post()
+string Red::get_body()
 {
-  return _post;
+  return body;
 }
-void Red::append_post(string append_post)
+string Red::get_token()
+{ 
+  
+  ifstream cache;
+  cache.open ("cache.txt");
+  string output; 
+  getline(cache,output); 
+  cache.close();
+  return token;
+}
+void Red::append_body(string append_body)
 {
-  _post+=append_post;  
+  body+=append_body;  
 }
 void Red::append_host(string append_host)
 {
@@ -323,19 +351,31 @@ string Red::get_certificate()
 { 
   return certificate;
 }
+long Red::get_HTTPcode()
+{ 
+  return HTTPcode;
+}
 
 string Red::set_red_option(Red* red,Red_Option option,string value)
 {    
+  string code ;
     switch (option) 
     {
         case SEND_DATAS :
-          red->set_post("{\"datatype\":\"");
-          red->append_post(red->get_data_type());
-          red->append_post("\",\"value\":\"");
-          red->append_post(value);
-          red->append_post("\"}");  
-          red->get_host() == Red_adress ? red->append_host("/device") : red->append_host("");                    
-          return red->post(red);
+          red->set_body("{\"datatype\":\"");
+          red->append_body(red->get_data_type());
+          red->append_body("\",\"value\":\"");
+          red->append_body(value);
+          red->append_body("\"}");  
+          red->get_host() == Red_adress ? red->append_host("/device/newdata") : red->append_host(""); 
+          red->post(red);
+          if(red->get_HTTPcode()==401)
+          {    
+            cout<<"Old token.. getting a new one\n";       
+            return red->post(red);
+          }else {
+            return to_string(red->get_HTTPcode()); 
+          }      
         break;        
         case SET_PASSPHRASE:        
             red->set_passphrase(value);
@@ -363,13 +403,20 @@ string Red::set_red_option(Red *red,Red_Option option,int value)
 switch (option)
 {
    case SEND_DATAS :
-          red->set_post("{\"datatype\":\"");
-          red->append_post(red->get_data_type());
-          red->append_post("\",\"value\":\"");
-          red->append_post(to_string(value));
-          red->append_post("\"}");      
-          red->get_host() == Red_adress ? red->append_host("/device") : red->append_host("");                    
-          return red->post(red);
+          red->set_body("{\"datatype\":\"");
+          red->append_body(red->get_data_type());
+          red->append_body("\",\"value\":\"");
+          red->append_body(to_string(value));
+          red->append_body("\"}");      
+          red->get_host() == Red_adress ? red->append_host("/device/newdata") : red->append_host(""); 
+          red->post(red);
+          if(red->get_HTTPcode()==401)
+          {    
+            cout<<"Old token.. getting a new one\n";       
+            return red->post(red);
+          }else {
+            return to_string(red->get_HTTPcode()); 
+          }      
           break;  
     case ADD_NEW_DEVICE:          
           red->get_host()== Red_adress ? red->append_host("/device/new/") : red->append_host("");    
@@ -386,38 +433,52 @@ switch (option)
 string Red::set_red_option(Red* red,Red_Option option, float value)
 {   
   switch (option)
-{
+  { 
    case SEND_DATAS :
-          red->set_post("{\"datatype\":\"");
-          red->append_post(red->get_data_type());
-          red->append_post("\",\"value\":\"");
-          red->append_post(to_string(value));
-          red->append_post("\"}");          
-          red->get_host() == Red_adress ? red->append_host("/device") : red->append_host("");                    
-          return red->post(red);
+          red->set_body("{\"datatype\":\"");
+          red->append_body(red->get_data_type());
+          red->append_body("\",\"value\":\"");
+          red->append_body(to_string(value));
+          red->append_body("\"}");          
+          red->get_host() == Red_adress ? red->append_host("/device/newdata") : red->append_host(""); 
+          red->post(red);
+          if(red->get_HTTPcode()==401)
+          {    
+            cout<<"Old token.. getting a new one\n";       
+            return red->post(red);
+          }else {
+            return to_string(red->get_HTTPcode()); 
+          }      
    break;
    default:
     return "not recognized option";
-}    
+  }    
     return "OK";
 }
 
 string Red::set_red_option(Red* red,Red_Option option, char value)
 {     
   switch (option)
-{  
+  {  
    case SEND_DATAS :         
-          red->set_post("{\"datatype\":\"");
-          red->append_post(red->get_data_type());
-          red->append_post("\",\"value\":\"");
-          red->append_post(to_string(value));
-          red->append_post("\"}");         
-          red->get_host() == Red_adress ? red->append_host("/device") : red->append_host("");                    
-          return red->post(red);
+          red->set_body("{\"datatype\":\"");
+          red->append_body(red->get_data_type());
+          red->append_body("\",\"value\":\"");
+          red->append_body(to_string(value));
+          red->append_body("\"}");         
+          red->get_host() == Red_adress ? red->append_host("/device/newdata") : red->append_host(""); 
+          red->post(red);
+          if(red->get_HTTPcode()==401)
+          {    
+            cout<<"Old token.. getting a new one\n";       
+            return red->post(red);
+          }else {
+            return to_string(red->get_HTTPcode()); 
+          }      
    break;   
    default:
     return "not recognized option";
-}    
+  }    
     return "OK";
 }
 string Red::set_red_option(Red* red,Red_Option option)
@@ -452,6 +513,7 @@ string Red::set_red_option(Red* red,Red_Option option)
     }
     
 }
+
 
 
 #endif // RED_H_INCLUDED
