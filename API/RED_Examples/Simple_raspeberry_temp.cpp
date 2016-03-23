@@ -22,8 +22,7 @@ int main(int argc, char *argv[])
 {
 	Red* red =new Red();	
 	string data_type=argv[1];
-	string value =argv[2];	
-	cout<<value;
+	string value =argv[2];		
 	//red_config will return a red object with the Red server adress by default
 	//Or you can set up your own server adress by using red->set_red_option(red,Red_Option::SET_HOST,"http://example.com");
 	//Or you can set up after the default Red server adress if you don't want to pass by red_config using : red->set_red_option(red,Red_Option::SET_RED_HOST);

@@ -187,7 +187,8 @@ string Red::post (Red* red)
     /* always cleanup */
     curl_easy_cleanup(curl);  
   }
-  if( red->get_HTTPcode()==401)
+  
+  if( response_HTTP_CODE_from_server==401)
   {   
     red->set_token(parse_token(response_POST_from_server));   
     return to_string(red->get_HTTPcode());
@@ -313,14 +314,13 @@ string Red::get_body()
   return body;
 }
 string Red::get_token()
-{ 
-  
+{   
   ifstream cache;
   cache.open ("cache.txt");
   string output; 
   getline(cache,output); 
   cache.close();
-  return token;
+  return output;
 }
 void Red::append_body(string append_body)
 {
@@ -368,8 +368,8 @@ string Red::set_red_option(Red* red,Red_Option option,string value)
           red->append_body(value);
           red->append_body("\"}");  
           red->get_host() == Red_adress ? red->append_host("/device/newdata") : red->append_host(""); 
-          red->post(red);
-          if(red->get_HTTPcode()==401)
+          
+          if(red->post(red)=="401")
           {    
             cout<<"Old token.. getting a new one\n";       
             return red->post(red);

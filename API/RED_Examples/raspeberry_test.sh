@@ -1,7 +1,9 @@
 #!/bin/bash
-
+declare -i number
+number=0
 while true
-do		
-  ./raspeberry "raspberry_temp" /opt/vc/bin/vcgencmd measure_temp
+do	
+	number=$((number+1))
+  ./raspeberry "number" $number
     sleep 10m
 done
