@@ -1,5 +1,5 @@
-//To send : g++ -o launch Simple_post.cpp -lcurl -std=c++11 -Wall && ./launch
- 
+//To get : g++ -o launch Simple_get_update.cpp -lcurl -std=c++11 -Wall && ./launch
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////	 _____    _____   _____  ///////////////////////////////////////////////////////	
@@ -12,35 +12,36 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-         
+//To get datas from the red server you need to specifie the device Id the data type.
+
+
 #include "../Red_librairies/Red.h"
 
 #include <iostream>
 #include <stdio.h>
 
+
+
 int main(void)
 {
-	Red* red =new Red();	
-	string data_type="JANKO";
-	string value="JANKO la grosse";
+	Red* red =new Red();
+	string datas ;
+	string data_type="Animal" ;
+	
 	//red_config will return a red object with the Red server adress by default
 	//Or you can set up your own server adress by using red->set_red_option(red,Red_Option::SET_HOST,"http://example.com");
 	//Or you can set up after the default Red server adress if you don't want to pass by red_config using : red->set_red_option(red,Red_Option::SET_RED_HOST);
 	red=red_config(); 
 
-	//Setting up the device Id
-	//red->set_red_option(red,Red_Option::SET_DEVICE_ID,device_id);
-	//Set your certificate that proves your a owner and give us your device ID
+	//Name your own data type label such as apple or peach
+	//red->set_red_option(red,Red_Option::SET_DATA_TYPE,data_type);
 	red->set_red_option(red,Red_Option::SET_CERTIFICATE,"RED-certifs/device4.pem");
 	red->set_red_option(red,Red_Option::SET_PASSPHRASE,"E1127CC6A2");
 
-	//Name your own data type labemonl such as apple or peach
-	red->set_red_option(red,Red_Option::SET_DATA_TYPE,data_type);
-
 	//You may want to display all the info about the red object before sending
-	
+	red->display();
+
 	//Send it safely using post (return a std::string response indication)
-    cout<< red->set_red_option(red,Red_Option::SEND_DATAS,value)<<endl;
-    red->display();
-    return 0;
+	datas=red->set_red_option(red,Red_Option::UPDATE);
+	cout<<datas<<endl;
 }

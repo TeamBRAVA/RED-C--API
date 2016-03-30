@@ -24,10 +24,11 @@ enum Red_Option {
   GET_DATAS,
   ADD_NEW_DEVICE,
   SET_PASSPHRASE,
-  SET_CERTIFICATE
+  SET_CERTIFICATE,
+  UPDATE
   };
 
-static const string Red_adress ="https://api.red-cloud.io";
+static const string Red_adress ="https://device.red-cloud.io";
 
 class Red{	
 
@@ -42,6 +43,7 @@ class Red{
   string certificate;
   string token;
   long HTTPcode;
+  string id_update;
   
 
   public:
@@ -54,6 +56,7 @@ class Red{
   
     virtual string post(Red* red);        
     virtual string get(Red* red);
+    virtual string update(Red* red);
     
 
 	  virtual string set_red_option(Red* red,Red_Option option,string value);
@@ -65,6 +68,7 @@ class Red{
     virtual void set_certificate(string path_cert);
     virtual void set_passphrase(string new_pass);
     virtual void set_host(string new_host);
+    virtual void set_id_update(string new_id);
     virtual void set_body(string new_body);
     virtual void set_buffer(string abuffer);
     virtual void set_data_type(string type);
@@ -76,6 +80,7 @@ class Red{
     virtual string get_certificate();
     virtual string get_passphrase();
     virtual string get_host();
+    virtual string get_id_update();
     virtual string get_body();
     virtual string get_buffer();
     virtual string get_data_type();
@@ -91,12 +96,29 @@ string parse_token(string result)
   to = result.find("message\":\"Unauthorized : invalid token")-59;  
   return result.substr(from,to);
 }
+string parse_get(string result)
+{
+  int from;
+  int to;
+  from = result.find("value")+8;
+  to = result.find("date")-13;  
+  return result.substr(from,to);
+}
+string parse_id_update(string result)
+{
+  int from;
+  int to;
+  from = result.find("id")+5;
+  to = result.find("name")-11; 
+  return result.substr(from,to);
+}
 
 //This function will create a red object with the red server adress by default
 Red* red_config()
 {
   Red* red_init=new Red();
   red_init->set_host(Red_adress) ;  
+  red_init->set_id_update("");
   return red_init;
 }
 
@@ -127,6 +149,25 @@ size_t handleBody(void *ptr, size_t size, size_t count, void *stream) {
   ((string*)stream)->append((char*)ptr, 0, size*count);
   return size*count;
 }
+
+struct FtpFile {
+  const char *filename;
+  FILE *stream;
+};
+
+
+static size_t handleFile(void *buffer, size_t size, size_t nmemb, void *stream)
+{
+  struct FtpFile *out=(struct FtpFile *)stream;
+  if(out && !out->stream) {
+    /* open file for writing */ 
+    out->stream=fopen(out->filename, "wb");
+    if(!out->stream)
+      return -1; /* failure, can't open file to write */ 
+  }
+  return fwrite(buffer, size, nmemb, out->stream);
+}
+
 
 
 string Red::post (Red* red)
@@ -203,12 +244,11 @@ string Red::get (Red* red)
   CURL *curl;
   CURLcode res;
   string response_GET_from_server; 
-
   struct curl_slist *headers = NULL;
   string host = red->get_host();
   string cert = red->get_certificate();
   string passphrase = red->get_passphrase();
-  string response_HTTP_CODE_from_server;
+  long response_HTTP_CODE_from_server;
   string response_header;  
   string token_header= "authorization: bearer "+red->get_token();
   curl_global_init(CURL_GLOBAL_DEFAULT);
@@ -266,14 +306,124 @@ string Red::get (Red* red)
     curl_easy_cleanup(curl);
   }
   curl_global_cleanup();
+   
+  if( response_HTTP_CODE_from_server==401)
+  {   
+    red->set_token(parse_token(response_GET_from_server));   
+    return red->get(red);
+  } 
+      return parse_get(response_GET_from_server) ;
+  }
 
-   return response_GET_from_server ;
+
+string Red::update (Red* red)
+{
+  CURL *curl;
+  CURLcode res;
+  string response_GET_from_server; 
+  struct curl_slist *headers = NULL;
+  string host = red->get_host();
+  string cert = red->get_certificate();
+  string passphrase = red->get_passphrase();
+  long response_HTTP_CODE_from_server;
+  string response_header;  
+  string token_header= "authorization: bearer "+red->get_token();
+  curl_global_init(CURL_GLOBAL_DEFAULT);
+
+ struct FtpFile ftpfile={
+    "RED-Update/update", /* name to store the file as if successful */ 
+    NULL
+    };  
+  curl = curl_easy_init();
+  if(curl) {
+
+    curl_easy_setopt(curl, CURLOPT_URL, host.c_str());
+    headers = curl_slist_append(headers, token_header.c_str());
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+
+#ifdef SKIP_PEER_VERIFICATION
+    /*
+     * If you want to connect to a site who isn't using a certificate that is
+     * signed by one of the certs in the CA bundle you have, you can skip the
+     * verification of the server's certificate. This makes the connection
+     * A LOT LESS SECURE.
+     *
+     * If you have a CA cert for the server stored someplace else than in the
+     * default bundle, then the CURLOPT_CAPATH option might come handy for
+     * you.
+     */
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+#endif
+
+#ifdef SKIP_HOSTNAME_VERIFICATION
+    /*
+     * If the site you're connecting to uses a different host name that what
+     * they have mentioned in their server certificate's commonName (or
+     * subjectAltName) fields, libcurl will refuse to connect. You can skip
+     * this check, but this will make the connection less secure.
+     */
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+#endif
+     //Add the certificate    
+    curl_easy_setopt(curl,CURLOPT_SSLCERT,cert.c_str());
+
+    //Add the passphrase
+    curl_easy_setopt(curl,CURLOPT_KEYPASSWD,passphrase.c_str());
+    if(red->get_id_update()=="")
+    {
+      curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, handleBody);
+      curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_GET_from_server);
+    }else {
+     
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, handleFile);    
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &ftpfile); 
+    }
+
+    
+    /* Perform the request, res will get the return code */
+    res = curl_easy_perform(curl);
+
+    curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &response_HTTP_CODE_from_server);
+    /* Check for errors */
+    if(res != CURLE_OK)
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",
+              curl_easy_strerror(res));    
+
+    /* always cleanup */
+    curl_easy_cleanup(curl);
+  }
+  curl_global_cleanup();
+  
+  if( response_HTTP_CODE_from_server==401)
+  {   
+    red->set_token(parse_token(response_GET_from_server));   
+    return red->update(red);
+  } 
+  if(red->get_id_update()=="")
+  {
+   
+      red->set_id_update(parse_id_update(response_GET_from_server));
+      red->append_host(red->get_id_update());
+      return red->update(red);
+  }
+  if(ftpfile.stream)
+    fclose(ftpfile.stream); /* close the local file */ 
+      cout<<response_GET_from_server<<endl;
+      return to_string(response_HTTP_CODE_from_server);
   }
 
 void Red::set_host(string new_host)
 {
   host=new_host;
 }
+
+void Red::set_id_update(string new_id)
+{
+  id_update=new_id;
+}
+
 void Red::set_body(string new_body)
 {
   body=new_body;
@@ -309,6 +459,11 @@ string Red::get_host()
 {
   return host;
 }
+string Red::get_id_update()
+{
+  return id_update;
+}
+
 string Red::get_body()
 {
   return body;
@@ -508,6 +663,10 @@ string Red::set_red_option(Red* red,Red_Option option)
       return "Red servers are now the new host";
       case LIST_PERMISSION:
       return "INCOMMING";
+      case UPDATE:
+      red->append_host("/device/update/");
+      return red->update(red);
+      
       default:
       return "no recognize option: ";
     }

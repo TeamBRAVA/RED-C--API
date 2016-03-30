@@ -26,7 +26,7 @@ int main(void)
 {
 	Red* red =new Red();
 	string datas ;
-	string data_type="Animal" ;
+	string data_type="Raspebbery temp" ;
 	
 	//red_config will return a red object with the Red server adress by default
 	//Or you can set up your own server adress by using red->set_red_option(red,Red_Option::SET_HOST,"http://example.com");
@@ -35,8 +35,8 @@ int main(void)
 
 	//Name your own data type label such as apple or peach
 	red->set_red_option(red,Red_Option::SET_DATA_TYPE,data_type);
-	red->set_red_option(red,Red_Option::SET_CERTIFICATE,"RED-certifs/device1.pem");
-	red->set_red_option(red,Red_Option::SET_PASSPHRASE,"0F9BCA6E5B");
+	red->set_red_option(red,Red_Option::SET_CERTIFICATE,"RED-certifs/device4.pem");
+	red->set_red_option(red,Red_Option::SET_PASSPHRASE,"E1127CC6A2");
 
 	//You may want to display all the info about the red object before sending
 	red->display();
