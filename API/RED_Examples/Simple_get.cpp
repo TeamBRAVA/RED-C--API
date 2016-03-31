@@ -20,13 +20,18 @@
 #include <iostream>
 #include <stdio.h>
 
-
-
-int main(void)
+int main(int argc, char *argv[])
 {
 	Red* red =new Red();
-	string datas ;
-	string data_type="Raspebbery temp" ;
+	string data_type;	
+	if(argc==2)
+	{
+		data_type=argv[1];		
+	}else 
+	{		
+		data_type="Raspebbery temp" ;
+	}	
+	string datas ;	
 	
 	//red_config will return a red object with the Red server adress by default
 	//Or you can set up your own server adress by using red->set_red_option(red,Red_Option::SET_HOST,"http://example.com");
