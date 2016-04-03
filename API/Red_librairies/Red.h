@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <curl/curl.h>
 #include <fstream>
+#include <sys/wait.h>
 
 using namespace std;
 
@@ -33,7 +34,6 @@ static const string Red_adress ="https://device.red-cloud.io";
 class Red{	
 
   protected:
-
 	string host;
   string body;   
   string header;
@@ -46,8 +46,7 @@ class Red{
   string id_update;
   
 
-  public:
-   
+  public:   
     Red(string ahost,string adata_type);
     Red();
     ~Red();
@@ -113,6 +112,19 @@ string parse_id_update(string result)
   return result.substr(from,to);
 }
 
+/*
+string exec(const char* cmd) {
+    std::shared_ptr<FILE> pipe(popen(cmd, "r"), pclose);
+    if (!pipe) return "ERROR";
+    char buffer[128];
+    std::string result = "";
+    while (!feof(pipe.get())) {
+        if (fgets(buffer, 128, pipe.get()) != NULL)
+            result += buffer;
+    }
+    return result;
+}
+*/
 //This function will create a red object with the red server adress by default
 Red* red_config()
 {
@@ -638,6 +650,8 @@ string Red::set_red_option(Red* red,Red_Option option, char value)
 }
 string Red::set_red_option(Red* red,Red_Option option)
 {
+  string res;  
+  int ret;
     switch(option)
     {
       case  GET_HOST:
@@ -663,16 +677,33 @@ string Red::set_red_option(Red* red,Red_Option option)
       return "Red servers are now the new host";
       case LIST_PERMISSION:
       return "INCOMMING";
-      case UPDATE:
+      case UPDATE:      
       red->append_host("/device/update/");
-      return red->update(red);
-      
+      res = red->update(red);
+      if(res=="200")
+      {      
+        ret=system("sudo dpkg -i RED-Update/update");
+      if (WEXITSTATUS(ret) == 0x0)
+      {
+      //Bien fini et bien executé
+        red->set_host(Red_adress) ;  
+        red->append_host("/device/ack/");
+        red->append_host(red->get_id_update());
+        if(red->post(red)=="401")
+          {    
+            cout<<"Old token.. getting a new one\n";       
+            return red->post(red);
+          }else {
+            return to_string(red->get_HTTPcode()); 
+          }      
+
+     }else
+      return "Erreur instalation .deb";
+      }
+     
       default:
       return "no recognize option: ";
     }
     
 }
-
-
-
 #endif // RED_H_INCLUDED
