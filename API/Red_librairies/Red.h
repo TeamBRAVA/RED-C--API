@@ -694,6 +694,7 @@ string Red::set_red_option(Red* red,Red_Option option)
             cout<<"Old token.. getting a new one\n";       
             return red->post(red);
           }else {
+            cout<<ret<<endl;
             return to_string(red->get_HTTPcode()); 
           }      
 
