@@ -1,3 +1,7 @@
+/*! \file test.cpp
+ * An example of resolving typedefs.
+ */
+
 #ifndef RED_H_INCLUDED
 #define RED_H_INCLUDED
 
@@ -30,11 +34,14 @@ enum Red_Option {
   };
 
 static const string Red_adress ="https://device.red-cloud.io";
-
-class Red{	
+/**
+*
+* This is the class Red thta will support all our code
+*/
+class Red{  
 
   protected:
-	string host;
+  string host;
   string body;   
   string header;
   string data_type;
@@ -58,7 +65,7 @@ class Red{
     virtual string update(Red* red);
     
 
-	  virtual string set_red_option(Red* red,Red_Option option,string value);
+    virtual string set_red_option(Red* red,Red_Option option,string value);
     virtual string set_red_option(Red* red,Red_Option option,int value);
     virtual string set_red_option(Red* red,Red_Option option,float value);
     virtual string set_red_option(Red* red,Red_Option option,char value);
@@ -652,6 +659,7 @@ string Red::set_red_option(Red* red,Red_Option option)
 {
   string res;  
   int ret;
+  ofstream update;
     switch(option)
     {
       case  GET_HOST:
@@ -677,9 +685,9 @@ string Red::set_red_option(Red* red,Red_Option option)
       return "Red servers are now the new host";
       case LIST_PERMISSION:
       return "INCOMMING";
-      case UPDATE:      
+      case UPDATE:           
       red->append_host("/device/update/");
-      res = red->update(red);
+      res = red->update(red);      
       if(res=="200")
       {      
         ret=system("sudo dpkg -i RED-Update/update");
@@ -687,14 +695,16 @@ string Red::set_red_option(Red* red,Red_Option option)
       {
       //Bien fini et bien executé
         red->set_host(Red_adress) ;  
-        red->append_host("/device/ack/");
+        red->append_host("/device/update/ack/");
         red->append_host(red->get_id_update());
+        update.open ("RED-Update/update_version.txt"); 
+        update << red->get_id_update();
+        update.close();       
         if(red->post(red)=="401")
           {    
             cout<<"Old token.. getting a new one\n";       
             return red->post(red);
-          }else {
-            cout<<ret<<endl;
+          }else {            
             return to_string(red->get_HTTPcode()); 
           }      
 
