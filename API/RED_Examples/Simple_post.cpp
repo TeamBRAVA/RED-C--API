@@ -29,8 +29,8 @@ int main(int argc, char *argv[])
 		value =argv[2];
 	}else 
 	{		
-		data_type="JANKO";
-		value="JANKO la grosse";
+		data_type="Animal";
+		value="Shark";
 	}	
 
 	//red_config will return a red object with the Red server adress by default

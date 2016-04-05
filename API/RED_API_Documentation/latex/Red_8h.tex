@@ -1,0 +1,129 @@
+\hypertarget{Red_8h}{}\section{Red.\+h File Reference}
+\label{Red_8h}\index{Red.\+h@{Red.\+h}}
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$iostream$>$}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$curl/curl.\+h$>$}\\*
+{\ttfamily \#include $<$fstream$>$}\\*
+{\ttfamily \#include $<$sys/wait.\+h$>$}\\*
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classRed}{Red}
+\item 
+struct \hyperlink{structFtpFile}{Ftp\+File}
+\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{Red_8h_a698dd63ab362aeda6776c6d7607de714}{Red\+\_\+\+Option} \{ \\*
+\hyperlink{Red_8h_a698dd63ab362aeda6776c6d7607de714a6f34194665860e7d2802b13d136d2ea9}{S\+E\+T\+\_\+\+H\+O\+ST}, 
+\hyperlink{Red_8h_a698dd63ab362aeda6776c6d7607de714a8f6c37c9e25b573b577182ee39dfd12b}{S\+E\+T\+\_\+\+R\+E\+D\+\_\+\+H\+O\+ST}, 
+\hyperlink{Red_8h_a698dd63ab362aeda6776c6d7607de714a7c30852c7b6206b7b2dc46fb933d09ae}{S\+E\+T\+\_\+\+D\+A\+T\+A\+\_\+\+T\+Y\+PE}, 
+\hyperlink{Red_8h_a698dd63ab362aeda6776c6d7607de714a0358531de7a98ec1a223a0126db31868}{S\+E\+T\+\_\+\+B\+U\+F\+F\+ER}, 
+\\*
+\hyperlink{Red_8h_a698dd63ab362aeda6776c6d7607de714a736f3a43f08547744e2348cd22a4336b}{S\+E\+T\+\_\+\+N\+E\+W\+\_\+\+P\+E\+R\+M\+I\+S\+S\+I\+ON}, 
+\hyperlink{Red_8h_a698dd63ab362aeda6776c6d7607de714ad1f94a759ea943d7e3e650496f291bd2}{G\+E\+T\+\_\+\+H\+O\+ST}, 
+\hyperlink{Red_8h_a698dd63ab362aeda6776c6d7607de714a9657a18705d3391d015dac6e72419f71}{G\+E\+T\+\_\+\+D\+A\+T\+A\+\_\+\+T\+Y\+PE}, 
+\hyperlink{Red_8h_a698dd63ab362aeda6776c6d7607de714a38718ea169e678ff631ea9c1558f3688}{G\+E\+T\+\_\+\+B\+U\+F\+F\+ER}, 
+\\*
+\hyperlink{Red_8h_a698dd63ab362aeda6776c6d7607de714a70da4f3067d09044382bf63cb3d5e56d}{L\+I\+S\+T\+\_\+\+P\+E\+R\+M\+I\+S\+S\+I\+ON}, 
+\hyperlink{Red_8h_a698dd63ab362aeda6776c6d7607de714a4cbbed36bc5e1ec075efa5b8bdbc3cf4}{S\+E\+N\+D\+\_\+\+D\+A\+T\+AS}, 
+\hyperlink{Red_8h_a698dd63ab362aeda6776c6d7607de714ae824ea1c11e5d448945f3738a8b68dc3}{G\+E\+T\+\_\+\+D\+A\+T\+AS}, 
+\hyperlink{Red_8h_a698dd63ab362aeda6776c6d7607de714ab98fa3a4c986ab3eea36c3b58eb174a8}{A\+D\+D\+\_\+\+N\+E\+W\+\_\+\+D\+E\+V\+I\+CE}, 
+\\*
+\hyperlink{Red_8h_a698dd63ab362aeda6776c6d7607de714a53717daac7bd8bc0b86fea4bbbb92bc9}{S\+E\+T\+\_\+\+P\+A\+S\+S\+P\+H\+R\+A\+SE}, 
+\hyperlink{Red_8h_a698dd63ab362aeda6776c6d7607de714aa939ec849c5e481ae0f00e94a744de3d}{S\+E\+T\+\_\+\+C\+E\+R\+T\+I\+F\+I\+C\+A\+TE}, 
+\hyperlink{Red_8h_a698dd63ab362aeda6776c6d7607de714a3912ed627c0090ccc7fa1b03fef04202}{U\+P\+D\+A\+TE}
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+string \hyperlink{Red_8h_a718e806111047bc0840aa4c54c0e7b83}{parse\+\_\+token} (string result)
+\item 
+string \hyperlink{Red_8h_a8f87b72433263279ad138e8ae2a39b4c}{parse\+\_\+get} (string result)
+\item 
+string \hyperlink{Red_8h_af69022874ef7dea622213b1ce0feea4b}{parse\+\_\+id\+\_\+update} (string result)
+\item 
+\hyperlink{classRed}{Red} $\ast$ \hyperlink{Red_8h_a849e686a14c90cc8216073b2659476dd}{red\+\_\+config} ()
+\item 
+size\+\_\+t {\bfseries handle\+Header} (void $\ast$ptr, size\+\_\+t size, size\+\_\+t count, void $\ast$stream)\hypertarget{Red_8h_ab092d4752df32488239e1c132ffa3988}{}\label{Red_8h_ab092d4752df32488239e1c132ffa3988}
+
+\item 
+size\+\_\+t {\bfseries handle\+Body} (void $\ast$ptr, size\+\_\+t size, size\+\_\+t count, void $\ast$stream)\hypertarget{Red_8h_aac636bf6229e7f74c5b4c723309f02df}{}\label{Red_8h_aac636bf6229e7f74c5b4c723309f02df}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Enumeration Type Documentation}
+\index{Red.\+h@{Red.\+h}!Red\+\_\+\+Option@{Red\+\_\+\+Option}}
+\index{Red\+\_\+\+Option@{Red\+\_\+\+Option}!Red.\+h@{Red.\+h}}
+\subsubsection[{\texorpdfstring{Red\+\_\+\+Option}{Red_Option}}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf Red\+\_\+\+Option}}\hypertarget{Red_8h_a698dd63ab362aeda6776c6d7607de714}{}\label{Red_8h_a698dd63ab362aeda6776c6d7607de714}
+List d\textquotesingle{}enum \begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{S\+E\+T\+\_\+\+H\+O\+ST@{S\+E\+T\+\_\+\+H\+O\+ST}!Red.\+h@{Red.\+h}}\index{Red.\+h@{Red.\+h}!S\+E\+T\+\_\+\+H\+O\+ST@{S\+E\+T\+\_\+\+H\+O\+ST}}\item[{\em 
+S\+E\+T\+\_\+\+H\+O\+ST\hypertarget{Red_8h_a698dd63ab362aeda6776c6d7607de714a6f34194665860e7d2802b13d136d2ea9}{}\label{Red_8h_a698dd63ab362aeda6776c6d7607de714a6f34194665860e7d2802b13d136d2ea9}
+}]This option let the user change the hostname if he doesn\textquotesingle{}t want to use our \hyperlink{classRed}{Red} server \index{S\+E\+T\+\_\+\+R\+E\+D\+\_\+\+H\+O\+ST@{S\+E\+T\+\_\+\+R\+E\+D\+\_\+\+H\+O\+ST}!Red.\+h@{Red.\+h}}\index{Red.\+h@{Red.\+h}!S\+E\+T\+\_\+\+R\+E\+D\+\_\+\+H\+O\+ST@{S\+E\+T\+\_\+\+R\+E\+D\+\_\+\+H\+O\+ST}}\item[{\em 
+S\+E\+T\+\_\+\+R\+E\+D\+\_\+\+H\+O\+ST\hypertarget{Red_8h_a698dd63ab362aeda6776c6d7607de714a8f6c37c9e25b573b577182ee39dfd12b}{}\label{Red_8h_a698dd63ab362aeda6776c6d7607de714a8f6c37c9e25b573b577182ee39dfd12b}
+}]This option will make the user use our \hyperlink{classRed}{Red} server (Recommended) if he didn\textquotesingle{}t use the red-\/config option \index{S\+E\+T\+\_\+\+D\+A\+T\+A\+\_\+\+T\+Y\+PE@{S\+E\+T\+\_\+\+D\+A\+T\+A\+\_\+\+T\+Y\+PE}!Red.\+h@{Red.\+h}}\index{Red.\+h@{Red.\+h}!S\+E\+T\+\_\+\+D\+A\+T\+A\+\_\+\+T\+Y\+PE@{S\+E\+T\+\_\+\+D\+A\+T\+A\+\_\+\+T\+Y\+PE}}\item[{\em 
+S\+E\+T\+\_\+\+D\+A\+T\+A\+\_\+\+T\+Y\+PE\hypertarget{Red_8h_a698dd63ab362aeda6776c6d7607de714a7c30852c7b6206b7b2dc46fb933d09ae}{}\label{Red_8h_a698dd63ab362aeda6776c6d7607de714a7c30852c7b6206b7b2dc46fb933d09ae}
+}]This option let the user choose the reference of the data he wants to send \index{S\+E\+T\+\_\+\+B\+U\+F\+F\+ER@{S\+E\+T\+\_\+\+B\+U\+F\+F\+ER}!Red.\+h@{Red.\+h}}\index{Red.\+h@{Red.\+h}!S\+E\+T\+\_\+\+B\+U\+F\+F\+ER@{S\+E\+T\+\_\+\+B\+U\+F\+F\+ER}}\item[{\em 
+S\+E\+T\+\_\+\+B\+U\+F\+F\+ER\hypertarget{Red_8h_a698dd63ab362aeda6776c6d7607de714a0358531de7a98ec1a223a0126db31868}{}\label{Red_8h_a698dd63ab362aeda6776c6d7607de714a0358531de7a98ec1a223a0126db31868}
+}]This option let the user enable the buffer option that will save his datas into a variable if he wants to send it back later \index{S\+E\+T\+\_\+\+N\+E\+W\+\_\+\+P\+E\+R\+M\+I\+S\+S\+I\+ON@{S\+E\+T\+\_\+\+N\+E\+W\+\_\+\+P\+E\+R\+M\+I\+S\+S\+I\+ON}!Red.\+h@{Red.\+h}}\index{Red.\+h@{Red.\+h}!S\+E\+T\+\_\+\+N\+E\+W\+\_\+\+P\+E\+R\+M\+I\+S\+S\+I\+ON@{S\+E\+T\+\_\+\+N\+E\+W\+\_\+\+P\+E\+R\+M\+I\+S\+S\+I\+ON}}\item[{\em 
+S\+E\+T\+\_\+\+N\+E\+W\+\_\+\+P\+E\+R\+M\+I\+S\+S\+I\+ON\hypertarget{Red_8h_a698dd63ab362aeda6776c6d7607de714a736f3a43f08547744e2348cd22a4336b}{}\label{Red_8h_a698dd63ab362aeda6776c6d7607de714a736f3a43f08547744e2348cd22a4336b}
+}]C\+O\+M\+I\+NG S\+O\+ON \index{G\+E\+T\+\_\+\+H\+O\+ST@{G\+E\+T\+\_\+\+H\+O\+ST}!Red.\+h@{Red.\+h}}\index{Red.\+h@{Red.\+h}!G\+E\+T\+\_\+\+H\+O\+ST@{G\+E\+T\+\_\+\+H\+O\+ST}}\item[{\em 
+G\+E\+T\+\_\+\+H\+O\+ST\hypertarget{Red_8h_a698dd63ab362aeda6776c6d7607de714ad1f94a759ea943d7e3e650496f291bd2}{}\label{Red_8h_a698dd63ab362aeda6776c6d7607de714ad1f94a759ea943d7e3e650496f291bd2}
+}]Return the current host whe are sending to \index{G\+E\+T\+\_\+\+D\+A\+T\+A\+\_\+\+T\+Y\+PE@{G\+E\+T\+\_\+\+D\+A\+T\+A\+\_\+\+T\+Y\+PE}!Red.\+h@{Red.\+h}}\index{Red.\+h@{Red.\+h}!G\+E\+T\+\_\+\+D\+A\+T\+A\+\_\+\+T\+Y\+PE@{G\+E\+T\+\_\+\+D\+A\+T\+A\+\_\+\+T\+Y\+PE}}\item[{\em 
+G\+E\+T\+\_\+\+D\+A\+T\+A\+\_\+\+T\+Y\+PE\hypertarget{Red_8h_a698dd63ab362aeda6776c6d7607de714a9657a18705d3391d015dac6e72419f71}{}\label{Red_8h_a698dd63ab362aeda6776c6d7607de714a9657a18705d3391d015dac6e72419f71}
+}]returns the reference of the data he wants to send \index{G\+E\+T\+\_\+\+B\+U\+F\+F\+ER@{G\+E\+T\+\_\+\+B\+U\+F\+F\+ER}!Red.\+h@{Red.\+h}}\index{Red.\+h@{Red.\+h}!G\+E\+T\+\_\+\+B\+U\+F\+F\+ER@{G\+E\+T\+\_\+\+B\+U\+F\+F\+ER}}\item[{\em 
+G\+E\+T\+\_\+\+B\+U\+F\+F\+ER\hypertarget{Red_8h_a698dd63ab362aeda6776c6d7607de714a38718ea169e678ff631ea9c1558f3688}{}\label{Red_8h_a698dd63ab362aeda6776c6d7607de714a38718ea169e678ff631ea9c1558f3688}
+}]returns the buffer \index{L\+I\+S\+T\+\_\+\+P\+E\+R\+M\+I\+S\+S\+I\+ON@{L\+I\+S\+T\+\_\+\+P\+E\+R\+M\+I\+S\+S\+I\+ON}!Red.\+h@{Red.\+h}}\index{Red.\+h@{Red.\+h}!L\+I\+S\+T\+\_\+\+P\+E\+R\+M\+I\+S\+S\+I\+ON@{L\+I\+S\+T\+\_\+\+P\+E\+R\+M\+I\+S\+S\+I\+ON}}\item[{\em 
+L\+I\+S\+T\+\_\+\+P\+E\+R\+M\+I\+S\+S\+I\+ON\hypertarget{Red_8h_a698dd63ab362aeda6776c6d7607de714a70da4f3067d09044382bf63cb3d5e56d}{}\label{Red_8h_a698dd63ab362aeda6776c6d7607de714a70da4f3067d09044382bf63cb3d5e56d}
+}]C\+O\+M\+I\+NG S\+O\+ON \index{S\+E\+N\+D\+\_\+\+D\+A\+T\+AS@{S\+E\+N\+D\+\_\+\+D\+A\+T\+AS}!Red.\+h@{Red.\+h}}\index{Red.\+h@{Red.\+h}!S\+E\+N\+D\+\_\+\+D\+A\+T\+AS@{S\+E\+N\+D\+\_\+\+D\+A\+T\+AS}}\item[{\em 
+S\+E\+N\+D\+\_\+\+D\+A\+T\+AS\hypertarget{Red_8h_a698dd63ab362aeda6776c6d7607de714a4cbbed36bc5e1ec075efa5b8bdbc3cf4}{}\label{Red_8h_a698dd63ab362aeda6776c6d7607de714a4cbbed36bc5e1ec075efa5b8bdbc3cf4}
+}]Send the data and data\+\_\+type \index{G\+E\+T\+\_\+\+D\+A\+T\+AS@{G\+E\+T\+\_\+\+D\+A\+T\+AS}!Red.\+h@{Red.\+h}}\index{Red.\+h@{Red.\+h}!G\+E\+T\+\_\+\+D\+A\+T\+AS@{G\+E\+T\+\_\+\+D\+A\+T\+AS}}\item[{\em 
+G\+E\+T\+\_\+\+D\+A\+T\+AS\hypertarget{Red_8h_a698dd63ab362aeda6776c6d7607de714ae824ea1c11e5d448945f3738a8b68dc3}{}\label{Red_8h_a698dd63ab362aeda6776c6d7607de714ae824ea1c11e5d448945f3738a8b68dc3}
+}]Returns the last specific data from the specified data type \index{A\+D\+D\+\_\+\+N\+E\+W\+\_\+\+D\+E\+V\+I\+CE@{A\+D\+D\+\_\+\+N\+E\+W\+\_\+\+D\+E\+V\+I\+CE}!Red.\+h@{Red.\+h}}\index{Red.\+h@{Red.\+h}!A\+D\+D\+\_\+\+N\+E\+W\+\_\+\+D\+E\+V\+I\+CE@{A\+D\+D\+\_\+\+N\+E\+W\+\_\+\+D\+E\+V\+I\+CE}}\item[{\em 
+A\+D\+D\+\_\+\+N\+E\+W\+\_\+\+D\+E\+V\+I\+CE\hypertarget{Red_8h_a698dd63ab362aeda6776c6d7607de714ab98fa3a4c986ab3eea36c3b58eb174a8}{}\label{Red_8h_a698dd63ab362aeda6776c6d7607de714ab98fa3a4c986ab3eea36c3b58eb174a8}
+}]C\+O\+M\+I\+NG S\+O\+ON \index{S\+E\+T\+\_\+\+P\+A\+S\+S\+P\+H\+R\+A\+SE@{S\+E\+T\+\_\+\+P\+A\+S\+S\+P\+H\+R\+A\+SE}!Red.\+h@{Red.\+h}}\index{Red.\+h@{Red.\+h}!S\+E\+T\+\_\+\+P\+A\+S\+S\+P\+H\+R\+A\+SE@{S\+E\+T\+\_\+\+P\+A\+S\+S\+P\+H\+R\+A\+SE}}\item[{\em 
+S\+E\+T\+\_\+\+P\+A\+S\+S\+P\+H\+R\+A\+SE\hypertarget{Red_8h_a698dd63ab362aeda6776c6d7607de714a53717daac7bd8bc0b86fea4bbbb92bc9}{}\label{Red_8h_a698dd63ab362aeda6776c6d7607de714a53717daac7bd8bc0b86fea4bbbb92bc9}
+}]Set the passphrase fot the certificate \index{S\+E\+T\+\_\+\+C\+E\+R\+T\+I\+F\+I\+C\+A\+TE@{S\+E\+T\+\_\+\+C\+E\+R\+T\+I\+F\+I\+C\+A\+TE}!Red.\+h@{Red.\+h}}\index{Red.\+h@{Red.\+h}!S\+E\+T\+\_\+\+C\+E\+R\+T\+I\+F\+I\+C\+A\+TE@{S\+E\+T\+\_\+\+C\+E\+R\+T\+I\+F\+I\+C\+A\+TE}}\item[{\em 
+S\+E\+T\+\_\+\+C\+E\+R\+T\+I\+F\+I\+C\+A\+TE\hypertarget{Red_8h_a698dd63ab362aeda6776c6d7607de714aa939ec849c5e481ae0f00e94a744de3d}{}\label{Red_8h_a698dd63ab362aeda6776c6d7607de714aa939ec849c5e481ae0f00e94a744de3d}
+}]Set the path of your \hyperlink{classRed}{Red} certificate \index{U\+P\+D\+A\+TE@{U\+P\+D\+A\+TE}!Red.\+h@{Red.\+h}}\index{Red.\+h@{Red.\+h}!U\+P\+D\+A\+TE@{U\+P\+D\+A\+TE}}\item[{\em 
+U\+P\+D\+A\+TE\hypertarget{Red_8h_a698dd63ab362aeda6776c6d7607de714a3912ed627c0090ccc7fa1b03fef04202}{}\label{Red_8h_a698dd63ab362aeda6776c6d7607de714a3912ed627c0090ccc7fa1b03fef04202}
+}]Update the software \end{description}
+\end{Desc}
+
+
+\subsection{Function Documentation}
+\index{Red.\+h@{Red.\+h}!parse\+\_\+get@{parse\+\_\+get}}
+\index{parse\+\_\+get@{parse\+\_\+get}!Red.\+h@{Red.\+h}}
+\subsubsection[{\texorpdfstring{parse\+\_\+get(string result)}{parse_get(string result)}}]{\setlength{\rightskip}{0pt plus 5cm}string parse\+\_\+get (
+\begin{DoxyParamCaption}
+\item[{string}]{result}
+\end{DoxyParamCaption}
+)}\hypertarget{Red_8h_a8f87b72433263279ad138e8ae2a39b4c}{}\label{Red_8h_a8f87b72433263279ad138e8ae2a39b4c}
+This function will parse the return from G\+ET J\+S\+ON object to select only the value \index{Red.\+h@{Red.\+h}!parse\+\_\+id\+\_\+update@{parse\+\_\+id\+\_\+update}}
+\index{parse\+\_\+id\+\_\+update@{parse\+\_\+id\+\_\+update}!Red.\+h@{Red.\+h}}
+\subsubsection[{\texorpdfstring{parse\+\_\+id\+\_\+update(string result)}{parse_id_update(string result)}}]{\setlength{\rightskip}{0pt plus 5cm}string parse\+\_\+id\+\_\+update (
+\begin{DoxyParamCaption}
+\item[{string}]{result}
+\end{DoxyParamCaption}
+)}\hypertarget{Red_8h_af69022874ef7dea622213b1ce0feea4b}{}\label{Red_8h_af69022874ef7dea622213b1ce0feea4b}
+This function will parse the return J\+S\+ON from update and select only the key of the software \index{Red.\+h@{Red.\+h}!parse\+\_\+token@{parse\+\_\+token}}
+\index{parse\+\_\+token@{parse\+\_\+token}!Red.\+h@{Red.\+h}}
+\subsubsection[{\texorpdfstring{parse\+\_\+token(string result)}{parse_token(string result)}}]{\setlength{\rightskip}{0pt plus 5cm}string parse\+\_\+token (
+\begin{DoxyParamCaption}
+\item[{string}]{result}
+\end{DoxyParamCaption}
+)}\hypertarget{Red_8h_a718e806111047bc0840aa4c54c0e7b83}{}\label{Red_8h_a718e806111047bc0840aa4c54c0e7b83}
+This function will parse the bearer header in J\+S\+ON to get the token \index{Red.\+h@{Red.\+h}!red\+\_\+config@{red\+\_\+config}}
+\index{red\+\_\+config@{red\+\_\+config}!Red.\+h@{Red.\+h}}
+\subsubsection[{\texorpdfstring{red\+\_\+config()}{red_config()}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Red}$\ast$ red\+\_\+config (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{Red_8h_a849e686a14c90cc8216073b2659476dd}{}\label{Red_8h_a849e686a14c90cc8216073b2659476dd}
+This function will create a red object with the red server adress by default 

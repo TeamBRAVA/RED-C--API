@@ -1,7 +1,4 @@
-/*! \file test.cpp
- * An example of resolving typedefs.
- */
-
+/*! \file Red.h*/ 
 #ifndef RED_H_INCLUDED
 #define RED_H_INCLUDED
 
@@ -13,33 +10,32 @@
 #include <sys/wait.h>
 
 using namespace std;
-
-static std::string readBuffer;
-enum Red_Option { 
-  SET_HOST, 
-  SET_RED_HOST,  
-  SET_DATA_TYPE,
-  SET_BUFFER,
-  SET_NEW_PERMISSION,
-  GET_HOST,  
-  GET_DATA_TYPE,
-  GET_BUFFER,
-  LIST_PERMISSION,
-  SEND_DATAS,
-  GET_DATAS,
-  ADD_NEW_DEVICE,
-  SET_PASSPHRASE,
-  SET_CERTIFICATE,
-  UPDATE
-  };
-
-static const string Red_adress ="https://device.red-cloud.io";
 /**
-*
-* This is the class Red thta will support all our code
-*/
-class Red{  
+List d'enum
+**/
+enum Red_Option { 
 
+  SET_HOST, /**< This option let the user change the hostname if he doesn't want to use our Red server */  
+  SET_RED_HOST, /**< This option will make the user use our Red server (Recommended) if he didn't use the red-config option*/  
+  SET_DATA_TYPE, /**< This option let the user choose the reference of the data he wants to send */ 
+  SET_BUFFER, /**< This option let the user enable the buffer option that will save his datas into a variable if he wants to send it back later */ 
+  SET_NEW_PERMISSION, /**< COMING SOON */ 
+  GET_HOST,   /**< Return the current host whe are sending to */ 
+  GET_DATA_TYPE,  /**< returns the reference of the data he wants to send */ 
+  GET_BUFFER, /**< returns the buffer */ 
+  LIST_PERMISSION, /**< COMING SOON */ 
+  SEND_DATAS, /**< Send the data and data_type */ 
+  GET_DATAS, /**< Returns the last specific data from the specified data type */ 
+  ADD_NEW_DEVICE, /**< COMING SOON*/ 
+  SET_PASSPHRASE, /**< Set the passphrase fot the certificate */ 
+  SET_CERTIFICATE,/**< Set the path of your Red certificate */ 
+  UPDATE /**< Update the software */ 
+  };
+/** This this the link to our Red Server */ 
+static const string Red_adress ="https://device.red-cloud.io";
+/** This is the class Red that will support all our code*/
+class Red{  
+  
   protected:
   string host;
   string body;   
@@ -64,11 +60,12 @@ class Red{
     virtual string get(Red* red);
     virtual string update(Red* red);
     
-
     virtual string set_red_option(Red* red,Red_Option option,string value);
     virtual string set_red_option(Red* red,Red_Option option,int value);
     virtual string set_red_option(Red* red,Red_Option option,float value);
     virtual string set_red_option(Red* red,Red_Option option,char value);
+
+/**The main method the user will have to use to communicate with he API Here you can send a Red_Option and no parameter*/
     virtual string set_red_option(Red* red,Red_Option option); 
 
     virtual void set_certificate(string path_cert);
@@ -94,6 +91,7 @@ class Red{
     virtual long get_HTTPcode();
 
 };
+/** This function will parse the bearer header in JSON to get the token */
 string parse_token(string result)
 {
   int from;
@@ -102,6 +100,7 @@ string parse_token(string result)
   to = result.find("message\":\"Unauthorized : invalid token")-59;  
   return result.substr(from,to);
 }
+/** This function will parse the return from GET JSON object to select only the value */
 string parse_get(string result)
 {
   int from;
@@ -110,8 +109,15 @@ string parse_get(string result)
   to = result.find("date")-13;  
   return result.substr(from,to);
 }
+/** This function will parse the return JSON from update and select only the key of the software*/
 string parse_id_update(string result)
 {
+   
+  if (result.size()==2)
+  {
+cout<< result <<endl;
+    return "NULL";
+  }
   int from;
   int to;
   from = result.find("id")+5;
@@ -132,7 +138,7 @@ string exec(const char* cmd) {
     return result;
 }
 */
-//This function will create a red object with the red server adress by default
+/** This function will create a red object with the red server adress by default*/
 Red* red_config()
 {
   Red* red_init=new Red();
@@ -140,20 +146,20 @@ Red* red_config()
   red_init->set_id_update("");
   return red_init;
 }
-
+/** Red constructor*/
 Red::Red(string ahost,string adata_type) :
   host(ahost),data_type(adata_type)
 {}
-
+/** Red constructor*/
 Red::Red()
 {}
-
+/** Red destructor*/
 Red::~Red()
 {
   //cout << endl<<"Red object being destroyed!" << endl;
 }
 
-
+/** Display the info of the red object created*/
 void Red::display(){;
   cout <<endl<< "The host is: " << host<<endl<<"The data type is: "<<data_type<<endl<<"The certificate passphrase is: "<<certificate<<endl;
   !(buffer.empty()) ? cout<<"The buffer is: "<<buffer<<endl : cout<<endl;
@@ -168,12 +174,11 @@ size_t handleBody(void *ptr, size_t size, size_t count, void *stream) {
   ((string*)stream)->append((char*)ptr, 0, size*count);
   return size*count;
 }
-
+/** Struct for the file creator*/
 struct FtpFile {
   const char *filename;
   FILE *stream;
 };
-
 
 static size_t handleFile(void *buffer, size_t size, size_t nmemb, void *stream)
 {
@@ -186,9 +191,6 @@ static size_t handleFile(void *buffer, size_t size, size_t nmemb, void *stream)
   }
   return fwrite(buffer, size, nmemb, out->stream);
 }
-
-
-
 string Red::post (Red* red)
 {
   CURL *curl;
@@ -256,8 +258,6 @@ string Red::post (Red* red)
  
     return to_string(red->get_HTTPcode());
  }
-
-
 string Red::get (Red* red)
 {
   CURL *curl;
@@ -333,7 +333,6 @@ string Red::get (Red* red)
   } 
       return parse_get(response_GET_from_server) ;
   }
-
 
 string Red::update (Red* red)
 {
@@ -417,13 +416,19 @@ string Red::update (Red* red)
   
   if( response_HTTP_CODE_from_server==401)
   {   
-    red->set_token(parse_token(response_GET_from_server));   
+    red->set_token(parse_token(response_GET_from_server)); 
     return red->update(red);
   } 
+  
   if(red->get_id_update()=="")
-  {
-   
-      red->set_id_update(parse_id_update(response_GET_from_server));
+  {        
+
+      red->set_id_update(parse_id_update(response_GET_from_server));    
+
+      if(red->get_id_update()=="NULL")
+      {
+        return 0; 
+      }
       red->append_host(red->get_id_update());
       return red->update(red);
   }
@@ -437,7 +442,6 @@ void Red::set_host(string new_host)
 {
   host=new_host;
 }
-
 void Red::set_id_update(string new_id)
 {
   id_update=new_id;
@@ -530,6 +534,7 @@ long Red::get_HTTPcode()
   return HTTPcode;
 }
 
+/**The main method the user will have to use to communicate with he API Here you can send a Red_Option and a string has a parameter*/
 string Red::set_red_option(Red* red,Red_Option option,string value)
 {    
   string code ;
@@ -572,6 +577,7 @@ string Red::set_red_option(Red* red,Red_Option option,string value)
     return "OK";
 }
 
+/**The main method the user will have to use to communicate with he API Here you can send a Red_Option and a int has a parameter*/
 string Red::set_red_option(Red *red,Red_Option option,int value)
 {
 switch (option)
@@ -604,6 +610,7 @@ switch (option)
        return "OK";    
 }
 
+/**The main method the user will have to use to communicate with he API Here you can send a Red_Option and a float has a parameter*/
 string Red::set_red_option(Red* red,Red_Option option, float value)
 {   
   switch (option)
@@ -630,6 +637,7 @@ string Red::set_red_option(Red* red,Red_Option option, float value)
     return "OK";
 }
 
+/**The main method the user will have to use to communicate with he API Here you can send a Red_Option and a char has a parameter*/
 string Red::set_red_option(Red* red,Red_Option option, char value)
 {     
   switch (option)
@@ -655,11 +663,13 @@ string Red::set_red_option(Red* red,Red_Option option, char value)
   }    
     return "OK";
 }
+
+/**The main method the user will have to use to communicate with he API Here you can send a Red_Option and no parameter*/
 string Red::set_red_option(Red* red,Red_Option option)
 {
   string res;  
   int ret;
-  ofstream update;
+  ofstream update_file;
     switch(option)
     {
       case  GET_HOST:
@@ -697,9 +707,9 @@ string Red::set_red_option(Red* red,Red_Option option)
         red->set_host(Red_adress) ;  
         red->append_host("/device/update/ack/");
         red->append_host(red->get_id_update());
-        update.open ("RED-Update/update_version.txt"); 
-        update << red->get_id_update();
-        update.close();       
+        update_file.open ("RED-Update/update_version.txt"); 
+        update_file << red->get_id_update();
+        update_file.close();       
         if(red->post(red)=="401")
           {    
             cout<<"Old token.. getting a new one\n";       
@@ -710,6 +720,9 @@ string Red::set_red_option(Red* red,Red_Option option)
 
      }else
       return "Erreur instalation .deb";
+      }else 
+      {
+        return "Exit code :"+res ;
       }
      
       default:
